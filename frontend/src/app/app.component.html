@@ -1,0 +1,156 @@
+<div class="mainApp">
+  <div class="userInfo">
+    User Id:
+    <input [(ngModel)]="userIdInput" type="text" />
+    <mat-icon (click)="updateUserId()" class="refreshBtn">autorenew</mat-icon>
+  </div>
+  <div class="searchBar">
+    <input
+      class="searchInput"
+      [(ngModel)]="searchQuery"
+      type="text"
+      placeholder="Search"
+      (keyup.enter)="sendQuery()"
+    />
+    <div class="icon" (click)="sendQuery()">
+      Search
+      <mat-icon>search</mat-icon>
+    </div>
+    <div class="filtersBtn" (click)="toggleFiltersPanel()">
+      <mat-icon>filter_list</mat-icon> Filters
+    </div>
+    <div *ngIf="showFiltersFlag" class="filtersSection">
+      <div>Seat Capacity (Minimum)</div>
+      <input
+        class="seatInput"
+        type="number"
+        [(ngModel)]="filtersObj.seatCount"
+      />
+      <div>Features</div>
+      <div class="filters" *ngFor="let filterItem of faclitiesArr; index as i">
+        <input type="checkbox" name="" id="" [(ngModel)]="filterItem.checked" />
+        {{ filterItem.title }}
+      </div>
+
+      <div class="filterBtns">
+        <div class="actionBtn resetBtn" (click)="resetFilters()">Reset</div>
+        <div class="actionBtn applyBtn" (click)="applyFilters()">Apply</div>
+      </div>
+    </div>
+  </div>
+  <div class="resultsSection">
+    <div class="roomList scrollbar" id="style-1">
+      <div
+        (click)="selectRoom(room)"
+        class="roomCard"
+        [ngClass]="{
+          highLightCard: selectedRoom && room._id == selectedRoom._id
+        }"
+        *ngFor="let room of roomsList; index as i"
+      >
+        <div class="nameSection">
+          <div class="roomName">
+            {{ room.name }}
+          </div>
+          <div class="roomStatus">
+            {{ room?.status?.text }}
+          </div>
+        </div>
+        <div class="detailsSection">
+          <div class="featuresSection">
+            <div
+              class="feature"
+              *ngFor="let feature of room.facilities; index as i"
+            >
+              {{ feature }}
+            </div>
+          </div>
+          <div class="seating">{{ room.seatCapacity }} seat capacity</div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="showBookingFlag" class="bookingSection scrollbar" id="style-1">
+      <div class="roomInfo">
+        <div class="nameSection">
+          <div class="roomName">
+            {{ selectedRoom["name"] }}
+          </div>
+        </div>
+        <div class="detailsSection">
+          <div class="featuresSection">
+            <div
+              class="feature"
+              *ngFor="let feature of selectedRoom['facilities']; index as i"
+            >
+              {{ feature }}
+            </div>
+          </div>
+          <div class="seating">
+            {{ selectedRoom["seatCapacity"] }} seat capacity
+          </div>
+        </div>
+      </div>
+      <div class="calenderSection">
+        <div class="calender">
+          <mat-calendar
+            [minDate]="minDate"
+            [maxDate]="maxDate"
+            [selected]="selectedDate"
+            (selectedChange)="changeDate($event)"
+          ></mat-calendar>
+        </div>
+        <div class="bookingAction">
+          <div
+            *ngIf="newBookings.length"
+            class="actionBtn"
+            (click)="sendDetails()"
+          >
+            Book
+          </div>
+          <div
+            *ngIf="!newBookings.length && deletions.length"
+            class="actionBtn"
+            (click)="sendDetails()"
+          >
+            Update
+          </div>
+        </div>
+      </div>
+      <div *ngIf="showSlotsFlag" class="slots">
+        <div
+          class="slot"
+          (click)="toggleSlot(slot)"
+          *ngFor="let slot of slotMap | keyvalue : originalOrder; index as i"
+          [ngClass]="{
+            green: !slot.value['available'] && slot.value['self'],
+            red: !slot.value['available'] && !slot.value['self'],
+            disabled: slot.value['disabled'] && slot.value['available'],
+            'pointer-none': slot.value['disabled'] && !slot.value['available']
+          }"
+        >
+          {{ slot.value["time"] }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- <div>Booking Slots</div>
+      <div *ngFor="let booking of bookingsData; index as i">
+        <div (click)="toggleDate(booking.date)">Date: {{ booking.date }}</div>
+        <div *ngIf="selectedDate == booking.date">
+          <div
+            (click)="toggleSlot(slot, booking)"
+            *ngFor="let slot of slotMap | keyvalue"
+            class="slot"
+            [ngClass]="
+              !slot.value['available']
+                ? slot.value['self']
+                  ? 'green'
+                  : 'red'
+                : ''
+            "
+          >
+            {{ slot.value["time"] }}
+          </div>
+        </div>
+      </div> -->
